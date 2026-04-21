@@ -4,9 +4,10 @@ import { notFound } from 'next/navigation';
 
 const prisma = new PrismaClient();
 
-export default async function CustomerDetailPage({ params }: { params: { id: string } }) {
+export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const user = await prisma.user.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       orders: {
         include: { items: true },
