@@ -32,7 +32,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: /bin/sh -c "npx prisma db push && npm run build && npm start"
+    command: /bin/sh -c "npx prisma db push && npx prisma db seed && npm run build && npm start"
 
 volumes:
   postgres_data:

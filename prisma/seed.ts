@@ -6,7 +6,11 @@ const prisma = new PrismaClient();
 const DEFAULT_STOCK = 50;
 
 async function main() {
-  console.log('Clearing existing catalog...');
+  console.log('Clearing existing catalog (and orders that reference it)...');
+  // Order-items reference Products with default RESTRICT; clear the dependents first
+  // so this script is safe to run on every container start.
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
   await prisma.productVariation.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
