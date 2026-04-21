@@ -12,19 +12,66 @@ export default function AdminLayout({
 }) {
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar glass-panel">
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
         <div className="sidebar-header">
-          <h2>Nivi Admin</h2>
+          <h2>NIVI ORGANICS</h2>
         </div>
         <nav className="sidebar-nav">
-          <Link href="/admin/dashboard" className="nav-link">Dashboard</Link>
-          <Link href="/admin/products" className="nav-link">Products</Link>
-          <Link href="/admin/settings" className="nav-link">Settings</Link>
-          <Link href="/" className="nav-link return-link">← Storefront</Link>
+          <Link href="/admin/dashboard" className="nav-link">
+            <span>📊</span> Dashboard
+          </Link>
+          <Link href="/admin/orders" className="nav-link">
+            <span>📦</span> Orders
+          </Link>
+          <Link href="/admin/products" className="nav-link">
+            <span>🛍️</span> Products
+          </Link>
+          <Link href="/admin/customers" className="nav-link">
+            <span>👥</span> Customers
+          </Link>
+          <Link href="/admin/coupons" className="nav-link">
+            <span>🏷️</span> Coupons
+          </Link>
+          <Link href="/admin/shipping-tax" className="nav-link">
+            <span>🚛</span> Shipping & Tax
+          </Link>
+          <Link href="/admin/settings" className="nav-link">
+            <span>⚙️</span> Settings
+          </Link>
+          
+          <Link href="/" className="nav-link return-link">
+            <span>←</span> Return to Store
+          </Link>
         </nav>
       </aside>
+
+      {/* Main Content Area */}
       <main className="admin-main">
-        {children}
+        {/* Header Bar */}
+        <header className="admin-header">
+          <div className="admin-breadcrumb">
+            <span style={{ color: '#9ca3af', fontSize: '13px' }}>Admin / Home</span>
+          </div>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <div style={{ position: 'relative' }}>
+              <input 
+                type="text" 
+                placeholder="Global Search..." 
+                className="input-base" 
+                style={{ padding: '8px 16px', fontSize: '13px', width: '250px' }} 
+              />
+              <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }}>🔍</span>
+            </div>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+              A
+            </div>
+          </div>
+        </header>
+
+        <div className="admin-page-content">
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -20,6 +20,7 @@ export default function ContactPage() {
               { icon: '📍', label: 'Address', value: '45 Galle Road, Colombo 03, Sri Lanka' },
               { icon: '📞', label: 'Phone', value: '+94 11 234 5678' },
               { icon: '✉️', label: 'Email', value: 'hello@niviorganics.com' },
+              { icon: '🌐', label: 'Website', value: 'www.niviorganics.com' },
               { icon: '🕐', label: 'Hours', value: 'Mon–Fri: 9AM – 6PM' },
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '28px', alignItems: 'flex-start' }}>

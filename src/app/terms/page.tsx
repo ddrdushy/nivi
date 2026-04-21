@@ -31,7 +31,7 @@ export default function TermsPage() {
   return (
     <LegalPage title="Terms & Conditions" lastUpdated="April 21, 2026">
       <Section title="1. Introduction">
-        <p>Welcome to Nivi Organics (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;). By accessing or using our website at niviorganics.com, you agree to be bound by these Terms and Conditions. Please read them carefully before placing an order or using our services.</p>
+        <p>Welcome to Nivi Organics (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;). By accessing or using our website at www.niviorganics.com, you agree to be bound by these Terms and Conditions. Please read them carefully before placing an order or using our services.</p>
       </Section>
 
       <Section title="2. Use of the Website">

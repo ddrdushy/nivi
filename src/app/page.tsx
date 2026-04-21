@@ -1,7 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import Link from 'next/link';
+import ProductCard from '@/components/ProductCard';
 
 const prisma = new PrismaClient();
+
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const products = await prisma.product.findMany({
@@ -14,8 +17,10 @@ export default async function HomePage() {
     <div>
       {/* ─── HERO ─── */}
       <section style={{
-        background: 'linear-gradient(135deg, #fff5f6 0%, #fce4e8 100%)',
-        padding: '100px 0',
+        backgroundImage: 'linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.95)), url("/images/decorations/hero_bg.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        padding: '120px 0',
         textAlign: 'center',
       }}>
         <div className="container">
@@ -127,46 +132,8 @@ export default async function HomePage() {
               gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
               gap: '24px',
             }}>
-              {products.map((product, idx) => (
-                <Link href={`/product/${product.id}`} key={product.id} style={{ display: 'block' }}>
-                  <div className="product-card">
-                    {/* Badge */}
-                    <span className="badge-new">New</span>
-
-                    {/* Image */}
-                    <div style={{
-                      aspectRatio: '1/1',
-                      backgroundColor: '#fafafa',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '64px',
-                      borderBottom: '1px solid var(--color-border)',
-                    }}>
-                      🧴
-                    </div>
-
-                    {/* Hover actions */}
-                    <div className="card-actions">
-                      <button className="card-action-btn" title="Wishlist">♡</button>
-                      <button className="card-action-btn" title="Compare">⇄</button>
-                    </div>
-
-                    {/* Info */}
-                    <div style={{ padding: '16px' }}>
-                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
-                        {product.category?.name || 'Nivi Organics'}
-                      </p>
-                      <h3 style={{ fontSize: '15px', fontWeight: '600', color: 'var(--color-text-main)', marginBottom: '8px', lineHeight: 1.3 }}>
-                        {product.name}
-                      </h3>
-                      <div className="stars">★★★★☆</div>
-                      <div style={{ marginTop: '10px', fontWeight: '700', color: 'var(--color-text-main)', fontSize: '16px' }}>
-                        Rs. {product.price}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product as any} />
               ))}
             </div>
           )}
@@ -178,13 +145,13 @@ export default async function HomePage() {
         <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center' }}>
           <div style={{
             aspectRatio: '4/3',
-            backgroundColor: '#fce4e8',
+            backgroundImage: 'url("/images/decorations/split_banner.png")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
             borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '80px',
-          }}>🌿</div>
+            boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+            border: '1px solid var(--color-border)',
+          }}></div>
           <div>
             <p style={{ color: 'var(--color-primary)', fontSize: '12px', fontWeight: '700', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '12px' }}>
               New Arrivals
@@ -216,13 +183,11 @@ export default async function HomePage() {
             ].map((post, i) => (
               <div key={i} style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
                 <div style={{
-                  height: '200px',
-                  backgroundColor: '#fce4e8',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '60px',
-                }}>
-                  {post.emoji}
-                </div>
+                  height: '220px',
+                  backgroundImage: `url("/images/decorations/blog_${i + 1}.png")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}></div>
                 <div style={{ padding: '20px' }}>
                   <p style={{ color: 'var(--color-primary)', fontSize: '11px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
                     {post.category}

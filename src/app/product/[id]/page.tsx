@@ -24,20 +24,22 @@ export default async function ProductPage({ params }: { params: { id: string } }
       
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 1fr', gap: '64px', alignItems: 'start' }}>
         {/* Product Image Panel */}
-        <div style={{ 
-          aspectRatio: '3/4', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          backgroundColor: '#FFFFFF',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-sm)'
-        }}>
-           <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', opacity: 0.5 }}>
-              <span style={{ fontSize: '4rem' }}>🖼️</span>
-              <p style={{ marginTop: '16px', fontSize: '14px' }}>Image Placeholder</p>
-           </div>
-        </div>
+        {product.imageUrl ? (
+          <div style={{ aspectRatio: '1/1', border: '1px solid var(--color-border)', borderRadius: '8px', overflow: 'hidden' }}>
+            <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+        ) : (
+          <div style={{
+            aspectRatio: '1/1',
+            backgroundColor: '#fafafa',
+            borderRadius: '8px',
+            border: '1px solid var(--color-border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '120px'
+          }}>
+            🧴
+          </div>
+        )}
 
         {/* Product Details - Client Interactivity */}
         <ProductInterface product={product} />

@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useCart } from '@/context/CartContext';
+import { useRouter } from 'next/navigation';
+import { placeOrder } from '@/app/actions/checkout';
 
 type Props = {
   paymentConfig: any;
@@ -9,11 +12,70 @@ type Props = {
 }
 
 export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }: Props) {
+  const router = useRouter();
+  const { cart, subtotal, totalItems, clearCart } = useCart();
   const [step, setStep] = useState(1);
-  const [state, setState] = useState('');
-  
-  const activeTax = taxZones.find(t => t.region.toLowerCase() === state.toLowerCase())?.rate || 0;
-  const activeShipping = shippingZones.find(s => s.regions.toLowerCase().includes(state.toLowerCase()))?.baseRate || 0;
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Form State
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    address: '',
+    state: '',
+    zipCode: '',
+    phone: '',
+    paymentMethod: 'MANUAL'
+  });
+
+  const activeTaxRate = taxZones.find(t => t.region.toLowerCase() === formData.state.toLowerCase())?.rate || 0;
+  const activeShipping = shippingZones.find(s => s.regions.toLowerCase().includes(formData.state.toLowerCase()))?.baseRate || 0;
+
+  const taxTotal = (subtotal * activeTaxRate) / 100;
+  const total = subtotal + taxTotal + activeShipping;
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    const result = await placeOrder({
+      customerName: `${formData.firstName} ${formData.lastName}`,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      address: `${formData.address}, ${formData.state}, ${formData.zipCode}`,
+      subtotal,
+      taxTotal,
+      shippingTotal: activeShipping,
+      total,
+      paymentMethod: formData.paymentMethod,
+      items: cart.map(item => ({
+        productId: item.productId,
+        variationId: item.variationId,
+        productName: item.name,
+        quantity: item.quantity,
+        price: item.price
+      }))
+    });
+
+    if (result.success) {
+      clearCart();
+      router.push('/checkout/order-success');
+    } else {
+      setError(result.error || 'Failed to place order.');
+      setIsLoading(false);
+    }
+  };
+
+  if (totalItems === 0 && step === 1) {
+    return (
+      <div style={{ textAlign: 'center', padding: '80px 0' }}>
+        <h2 style={{ marginBottom: '24px' }}>Your cart is empty</h2>
+        <button className="btn-primary" onClick={() => router.push('/')}>Return to Shop</button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -22,12 +84,13 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
           1. Shipping Information
         </h2>
         <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: '1fr 1fr' }}>
-          <input type="text" className="input-base" style={{ borderRadius: '0' }} placeholder="First Name" />
-          <input type="text" className="input-base" style={{ borderRadius: '0' }} placeholder="Last Name" />
-          <input type="email" className="input-base" placeholder="Email Address" style={{ gridColumn: 'span 2', borderRadius: '0' }} />
-          <input type="text" className="input-base" placeholder="Address" style={{ gridColumn: 'span 2', borderRadius: '0' }} />
-          <input type="text" className="input-base" placeholder="State/Region (e.g. CA)" style={{ borderRadius: '0' }} onChange={(e) => setState(e.target.value)} />
-          <input type="text" className="input-base" placeholder="Zip Code" style={{ borderRadius: '0' }} />
+          <input type="text" className="input-base" style={{ borderRadius: '0' }} placeholder="First Name" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
+          <input type="text" className="input-base" style={{ borderRadius: '0' }} placeholder="Last Name" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
+          <input type="email" className="input-base" placeholder="Email Address" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+          <input type="text" className="input-base" placeholder="Phone Number" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+          <input type="text" className="input-base" placeholder="Street Address" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+          <input type="text" className="input-base" placeholder="State/Region (e.g. CA)" style={{ borderRadius: '0' }} value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} />
+          <input type="text" className="input-base" placeholder="Zip Code" style={{ borderRadius: '0' }} value={formData.zipCode} onChange={e => setFormData({...formData, zipCode: e.target.value})} />
         </div>
         {step === 1 && (
           <button className="btn-primary" onClick={() => setStep(2)} style={{ marginTop: '24px', borderRadius: '0', padding: '12px 32px' }}>Calculate Shipping</button>
@@ -46,16 +109,20 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
           
           <div style={{ backgroundColor: '#f9f9f9', padding: '16px', border: '1px solid var(--color-border)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span>Shipping to {state || 'Region'}</span>
-              <span>Rs. {activeShipping}</span>
+              <span>Items Total ({totalItems})</span>
+              <span>Rs. {subtotal.toLocaleString()}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span>Regional Tax ({activeTax}%)</span>
-              <span>Calculated on Subtotal</span>
+              <span>Shipping to {formData.state || 'Region'}</span>
+              <span>Rs. {activeShipping.toLocaleString()}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700', borderTop: '1px solid var(--color-border)', paddingTop: '12px', marginTop: '12px' }}>
-              <span>Estimated Added Value</span>
-              <span>Rs. {activeShipping} + Tax</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <span>Regional Tax ({activeTaxRate}%)</span>
+              <span>Rs. {taxTotal.toLocaleString()}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700', borderTop: '1px solid var(--color-border)', paddingTop: '12px', marginTop: '12px', fontSize: '18px' }}>
+              <span>Order Total</span>
+              <span>Rs. {total.toLocaleString()}</span>
             </div>
           </div>
           {step === 2 && (
@@ -81,13 +148,25 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
             )}
             {paymentConfig.stripe && (
                <label style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', border: '1px solid var(--color-border)', cursor: 'pointer' }}>
-                 <input type="radio" name="payment_method" value="STRIPE" />
+                 <input type="radio" name="payment_method" value="STRIPE" checked={formData.paymentMethod === 'STRIPE'} onChange={() => setFormData({...formData, paymentMethod: 'STRIPE'})} />
                  <div><strong style={{ display: 'block', fontSize: '14px', textTransform: 'uppercase' }}>Stripe</strong></div>
                </label>
             )}
           </div>
-          <button className="btn-primary" style={{ width: '100%', marginTop: '40px', padding: '18px 0', fontSize: '16px', borderRadius: '0' }}>
-            Complete Secure Payment
+          
+          {error && (
+            <div style={{ padding: '12px', backgroundColor: '#fff5f6', border: '1px solid #EC6B81', color: '#EC6B81', marginTop: '24px', fontSize: '13px' }}>
+              ❌ {error}
+            </div>
+          )}
+
+          <button 
+            className="btn-primary" 
+            disabled={isLoading}
+            onClick={handleSubmit}
+            style={{ width: '100%', marginTop: '40px', padding: '18px 0', fontSize: '16px', borderRadius: '0', opacity: isLoading ? 0.7 : 1 }}
+          >
+            {isLoading ? 'Processing Order...' : 'Complete Secure Payment'}
           </button>
         </div>
       )}
