@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: niviorganics
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@db:5432/niviorganics?schema=public
+      - NEXTAUTH_SECRET=supersecret123
+      - NEXTAUTH_URL=http://localhost:3000
+    depends_on:
+      - db
+    # Override standard start to ensure database migration runs first
+    command: /bin/sh -c "npx prisma db push && npm start"
+
+volumes:
+  postgres_data:

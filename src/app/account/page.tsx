@@ -1,0 +1,79 @@
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { PrismaClient } from "@prisma/client";
+import LogoutButton from "./LogoutButton";
+
+const prisma = new PrismaClient();
+
+export default async function AccountPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const userId = (session.user as any).id;
+
+  const orders = await prisma.order.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    include: { items: true }
+  });
+
+  return (
+    <div className="container" style={{ padding: '80px 24px', maxWidth: '800px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid var(--color-border)', paddingBottom: '24px' }}>
+        <h1 style={{ fontSize: '32px' }}>My Account</h1>
+        <LogoutButton />
+      </div>
+
+      <div style={{ marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '20px', marginBottom: '8px' }}>Welcome, {session.user?.name || session.user?.email}</h2>
+        <p style={{ color: 'var(--color-text-muted)' }}>Manage your orders and account details below.</p>
+      </div>
+
+      <h3 style={{ fontSize: '24px', marginBottom: '24px' }}>Order History</h3>
+      
+      {orders.length === 0 ? (
+        <div style={{ padding: '32px', border: '1px solid var(--color-border)', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+          You have not placed any orders yet.
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {orders.map((order) => (
+            <div key={order.id} style={{ border: '1px solid var(--color-border)', padding: '24px', borderRadius: 'var(--radius-sm)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px' }}>
+                <div>
+                  <strong>Order #{order.id.substring(0, 8).toUpperCase()}</strong>
+                  <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                    {order.createdAt.toLocaleDateString()}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ 
+                    display: 'inline-block', 
+                    padding: '4px 12px', 
+                    backgroundColor: order.status === 'DELIVERED' ? '#c9d2b7' : '#E5E5E5',
+                    color: '#0F0F0F',
+                    fontSize: '10px',
+                    fontWeight: '700',
+                    letterSpacing: '1px'
+                  }}>
+                    {order.status}
+                  </span>
+                  <div style={{ marginTop: '8px', fontWeight: '700' }}>
+                    Rs. {order.total}
+                  </div>
+                </div>
+              </div>
+              <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>
+                {order.items.length} item(s) purchased.
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
