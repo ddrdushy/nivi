@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Link from 'next/link';
+import CookieBanner from '@/components/CookieBanner';
 
 export const metadata: Metadata = {
   title: "Nivi Organics | Premium Natural Skincare",
@@ -203,15 +204,15 @@ export default function RootLayout({
             {/* Links */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
               {[
-                { title: '', links: ['Delivery', 'Secure Payment', 'Login'] },
-                { title: '', links: ['Legal Notice', 'Contact Us', 'My Account'] },
-                { title: '', links: ['About Us', 'Sitemap', 'Store'] },
+                { title: '', links: [{ label: 'Shipping Policy', href: '/shipping' }, { label: 'Returns & Refunds', href: '/returns' }, { label: 'Track Order', href: '/account' }] },
+                { title: '', links: [{ label: 'Terms & Conditions', href: '/terms' }, { label: 'Privacy Policy', href: '/privacy' }, { label: 'Cookie Policy', href: '/cookies' }] },
+                { title: '', links: [{ label: 'About Us', href: '/about' }, { label: 'Contact Us', href: '/contact' }, { label: 'Sitemap', href: '/sitemap' }] },
               ].map((col, i) => (
                 <div key={i}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '8px' }}>
                     {col.links.map((link) => (
-                      <Link key={link} href="/" style={{ color: '#888', fontSize: '14px', transition: 'color 0.2s' }}>
-                        {link}
+                      <Link key={link.label} href={link.href} style={{ color: '#888', fontSize: '14px', transition: 'color 0.2s' }}>
+                        {link.label}
                       </Link>
                     ))}
                   </div>
@@ -240,6 +241,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+        <CookieBanner />
       </body>
     </html>
   );
