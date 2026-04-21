@@ -116,6 +116,7 @@ model Coupon {
   usageLimit   Int?      // Null = unlimited
   usageCount   Int       @default(0)
   expiryDate   DateTime?
+  minOrderAmount Float?   @default(0)
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
 }

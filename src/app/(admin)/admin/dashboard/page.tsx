@@ -45,16 +45,32 @@ export default async function DashboardPage() {
     .sort((a, b) => b.rev - a.rev)
     .slice(0, 5);
 
-  // 3. Mock Chart Data (Simulating last 7 days of performance)
-  const chartData = [
-    { date: 'Mon', revenue: 12500, orders: 4 },
-    { date: 'Tue', revenue: 18000, orders: 7 },
-    { date: 'Wed', revenue: 15000, orders: 5 },
-    { date: 'Thu', revenue: 22000, orders: 9 },
-    { date: 'Fri', revenue: 35000, orders: 12 },
-    { date: 'Sat', revenue: 28000, orders: 8 },
-    { date: 'Sun', revenue: totalRevenue > 0 ? totalRevenue : 45000, orders: ordersCount > 0 ? ordersCount : 15 },
-  ];
+  // 3. Real Chart Data (Last 7 days)
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return {
+      date: days[d.getDay()],
+      fullDate: d.toISOString().split('T')[0],
+      revenue: 0,
+      orders: 0
+    };
+  });
+
+  validOrders.forEach(order => {
+    const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
+    const dayData = last7Days.find(d => d.fullDate === orderDate);
+    if (dayData) {
+      dayData.revenue += order.total;
+      dayData.orders += 1;
+    }
+  });
+
+  const lowStockThreshold = 5;
+  const lowStockProducts = await prisma.product.count({
+    where: { stock: { lte: lowStockThreshold } }
+  });
 
   return (
     <div>
@@ -85,7 +101,7 @@ export default async function DashboardPage() {
             </select>
           </div>
           <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '24px' }}>Visual representation of sales performance over the week.</p>
-          <SalesChart data={chartData} />
+          <SalesChart data={last7Days} />
         </div>
 
         {/* Top Products Panel */}
@@ -98,11 +114,29 @@ export default async function DashboardPage() {
             <div style={{ display: 'grid', gap: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid #f0f0f0' }}>
                 <span style={{ fontSize: '13px' }}>Low Stock Products</span>
-                <span style={{ backgroundColor: '#fee2e2', color: '#dc2626', padding: '2px 8px', borderRadius: '10px', fontSize: '11px', fontWeight: '700' }}>3 Alerts</span>
+                <span style={{ 
+                  backgroundColor: lowStockProducts > 0 ? '#fee2e2' : '#f3f4f6', 
+                  color: lowStockProducts > 0 ? '#dc2626' : '#6b7280', 
+                  padding: '2px 8px', 
+                  borderRadius: '10px', 
+                  fontSize: '11px', 
+                  fontWeight: '700' 
+                }}>
+                  {lowStockProducts} Alerts
+                </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid #f0f0f0' }}>
                 <span style={{ fontSize: '13px' }}>Pending Orders</span>
-                <span style={{ backgroundColor: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '10px', fontSize: '11px', fontWeight: '700' }}>{ordersCount} New</span>
+                <span style={{ 
+                  backgroundColor: ordersCount > 0 ? '#fef3c7' : '#f3f4f6', 
+                  color: ordersCount > 0 ? '#92400e' : '#6b7280', 
+                  padding: '2px 8px', 
+                  borderRadius: '10px', 
+                  fontSize: '11px', 
+                  fontWeight: '700' 
+                }}>
+                  {ordersCount} New
+                </span>
               </div>
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '13px' }}>Unresolved Tickets</span>
