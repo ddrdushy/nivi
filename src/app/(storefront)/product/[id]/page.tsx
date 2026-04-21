@@ -5,9 +5,10 @@ import { notFound } from 'next/navigation';
 
 const prisma = new PrismaClient();
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
+export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const product = await prisma.product.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { 
       category: true,
       variations: true 

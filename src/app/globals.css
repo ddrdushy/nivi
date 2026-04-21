@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
 
 * {
   box-sizing: border-box;
@@ -7,19 +7,26 @@
 }
 
 :root {
-  --color-primary: #EC6B81;
-  --color-primary-hover: #d9556e;
-  --color-secondary: #f8c6c9;
-  --color-nav-bg: #1a1a1a;
-  --color-nav-text: #ffffff;
-  --color-background: #ffffff;
-  --color-surface: #ffffff;
-  --color-text-main: #1a1a1a;
-  --color-text-muted: #666666;
-  --color-border: #e8e8e8;
-  --color-footer-bg: #111111;
-  
-  --font-body: 'Inter', system-ui, sans-serif;
+  /* ===== GLAMOROUS PALETTE ===== */
+  --color-primary:       #d098a2; /* Dusty Rose — CTAs, highlights */
+  --color-primary-hover: #c07f8a; /* Deeper rose on hover */
+  --color-gold:          #9f7726; /* Golden amber — accents, stars */
+  --color-dark:          #33271a; /* Deep dark brown — nav, footer, headings */
+  --color-taupe:         #c9b7a8; /* Warm taupe — borders, secondary UI */
+  --color-secondary:     #ede8e4; /* Light taupe tint — surface backgrounds */
+
+  /* ===== SEMANTIC TOKENS ===== */
+  --color-nav-bg:        #33271a;
+  --color-nav-text:      #f5f5f5;
+  --color-background:    #faf8f6;
+  --color-surface:       #ffffff;
+  --color-text-main:     #33271a;
+  --color-text-muted:    #7a6a5a;
+  --color-border:        #e2d9d0;
+  --color-footer-bg:     #33271a;
+
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
   --radius-sm: 4px;
   --radius-capsule: 50px;
 }
@@ -38,10 +45,11 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-body);
+  font-family: var(--font-heading);
   color: var(--color-text-main);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
 a {
@@ -74,22 +82,30 @@ button {
   border-radius: var(--radius-capsule);
   font-weight: 600;
   font-size: 13px;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 2px 12px rgba(208, 152, 162, 0.25);
 }
 
-.btn-primary:hover { background-color: var(--color-primary-hover); color: #fff; }
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(208, 152, 162, 0.4);
+}
 
 .btn-outline {
-  border: 1.5px solid var(--color-text-main);
-  color: var(--color-text-main);
+  border: 1.5px solid var(--color-dark);
+  color: var(--color-dark);
   padding: 10px 24px;
   border-radius: var(--radius-capsule);
   font-weight: 600;
   font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -127,11 +143,12 @@ button {
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: #fff;
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .product-card:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 40px rgba(51, 39, 26, 0.12);
+  transform: translateY(-3px);
 }
 
 .product-card .card-actions {
@@ -172,7 +189,7 @@ button {
 }
 
 /* Star rating */
-.stars { color: #f5a623; font-size: 13px; letter-spacing: 1px; }
+.stars { color: var(--color-gold); font-size: 13px; letter-spacing: 1px; }
 
 /* Badge */
 .badge-new {
@@ -186,6 +203,7 @@ button {
   padding: 3px 8px;
   border-radius: var(--radius-capsule);
   letter-spacing: 0.5px;
+  font-family: var(--font-body);
 }
 
 /* ===== CATEGORY TABS ===== */
@@ -199,23 +217,25 @@ button {
 
 .category-tab {
   padding: 12px 32px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-text-muted);
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   cursor: pointer;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   transition: all 0.2s ease;
   background: none;
   border-top: none;
   border-left: none;
   border-right: none;
+  font-family: var(--font-body);
 }
 
 .category-tab.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
+  color: var(--color-dark);
+  border-bottom-color: var(--color-gold);
 }
 
 .category-tab:hover { color: var(--color-primary); }
@@ -225,4 +245,64 @@ button {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+}
+
+/* ===== ADMIN STYLES ===== */
+.admin-page-title {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  color: var(--color-dark);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.admin-table-container {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  padding: 14px 20px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  background: var(--color-secondary);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-body);
+}
+
+.admin-table td {
+  padding: 16px 20px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-main);
+}
+
+.admin-table tr:last-child td { border-bottom: none; }
+
+.status-badge {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }

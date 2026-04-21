@@ -17,7 +17,7 @@ export default async function HomePage() {
     <div>
       {/* ─── HERO ─── */}
       <section style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.95)), url("/images/decorations/hero_bg.png")',
+        backgroundImage: 'linear-gradient(135deg, rgba(250,248,246,0.97) 0%, rgba(237,232,228,0.92) 100%), url("/images/decorations/hero_bg.png")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         padding: '120px 0',
@@ -36,10 +36,11 @@ export default async function HomePage() {
           </p>
           <h1 style={{
             fontSize: 'clamp(40px, 6vw, 72px)',
-            color: 'var(--color-text-main)',
+            color: 'var(--color-dark)',
             marginBottom: '20px',
-            fontWeight: '800',
-            letterSpacing: '-1px',
+            fontWeight: '600',
+            fontFamily: 'var(--font-heading)',
+            letterSpacing: '0.01em',
             lineHeight: 1.1,
           }}>
             Natural Luxury.<br />
@@ -66,7 +67,7 @@ export default async function HomePage() {
       </section>
 
       {/* ─── FEATURES STRIP ─── */}
-      <section style={{ backgroundColor: 'var(--color-primary)', padding: '20px 0' }}>
+      <section style={{ backgroundColor: 'var(--color-dark)', padding: '20px 0' }}>
         <div className="container" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
@@ -141,7 +142,7 @@ export default async function HomePage() {
       </section>
 
       {/* ─── BANNER SPLIT ─── */}
-      <section style={{ backgroundColor: '#f9f9f9', padding: '80px 0' }}>
+      <section style={{ backgroundColor: 'var(--color-secondary)', padding: '80px 0' }}>
         <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center' }}>
           <div style={{
             aspectRatio: '4/3',
