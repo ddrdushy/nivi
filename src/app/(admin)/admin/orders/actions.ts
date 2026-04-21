@@ -1,20 +1,25 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/auth-guard';
+import { z } from 'zod';
 
-const prisma = new PrismaClient();
+const statusSchema = z.enum(['PENDING', 'PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED']);
 
 export async function updateOrderStatus(orderId: string, status: string) {
   try {
+    await requireAdmin();
+    const parsed = statusSchema.parse(status);
     await prisma.order.update({
       where: { id: orderId },
-      data: { status }
+      data: { status: parsed },
     });
     revalidatePath('/admin/orders');
     revalidatePath(`/admin/orders/${orderId}`);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Failed';
+    return { success: false, error: msg };
   }
 }

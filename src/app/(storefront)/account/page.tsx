@@ -1,10 +1,8 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import LogoutButton from "./LogoutButton";
-
-const prisma = new PrismaClient();
 
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);
@@ -13,7 +11,7 @@ export default async function AccountPage() {
     redirect("/login");
   }
 
-  const userId = (session.user as any).id;
+  const userId = session.user.id;
 
   const orders = await prisma.order.findMany({
     where: { userId },

@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import Link from 'next/link';
 import ProductInterface from './ProductInterface';
 import { notFound } from 'next/navigation';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

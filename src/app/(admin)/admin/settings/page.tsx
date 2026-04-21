@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { updatePaymentSettings } from './actions';
-
-const prisma = new PrismaClient();
 
 export default async function SettingsPage() {
   const settings = await prisma.storeSetting.findMany();

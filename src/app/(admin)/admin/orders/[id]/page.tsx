@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import OrderStatusUpdater from './OrderStatusUpdater';
-
-const prisma = new PrismaClient();
 
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   PENDING:   { bg: '#fef3c7', color: '#92400e' },

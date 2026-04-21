@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 

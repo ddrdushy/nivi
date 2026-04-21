@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import CouponForm from '@/components/admin/CouponForm';
 import CouponTable from '@/components/admin/CouponTable';
-
-const prisma = new PrismaClient();
 
 export default async function CouponsAdminPage() {
   const coupons = await prisma.coupon.findMany({

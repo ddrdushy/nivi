@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { createShippingZone, deleteShippingZone, createTaxZone, deleteTaxZone } from './actions';
-
-const prisma = new PrismaClient();
 
 export default async function ShippingTaxAdminPage() {
   const shippingZones = await prisma.shippingZone.findMany();

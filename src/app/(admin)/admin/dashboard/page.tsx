@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import StatCard from '@/components/admin/StatCard';
 import SalesChart from '@/components/admin/SalesChart';
 import TopProducts from '@/components/admin/TopProducts';
-
-const prisma = new PrismaClient();
 
 export default async function DashboardPage() {
   // 1. Fetch Real Stats

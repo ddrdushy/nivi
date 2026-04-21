@@ -1,101 +1,112 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+const DEFAULT_STOCK = 50;
+
 async function main() {
-  console.log('Clearing existing products...');
+  console.log('Clearing existing catalog...');
   await prisma.productVariation.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
 
   console.log('Creating categories...');
-  const oilsCategory = await prisma.category.create({ data: { name: 'Essential Oils' } });
-  const buttersCategory = await prisma.category.create({ data: { name: 'Raw Butters & Waxes' } });
-  const powdersCategory = await prisma.category.create({ data: { name: 'Herbal Powders' } });
+  const oils = await prisma.category.create({ data: { name: 'Essential Oils' } });
+  const butters = await prisma.category.create({ data: { name: 'Raw Butters & Waxes' } });
+  const powders = await prisma.category.create({ data: { name: 'Herbal Powders' } });
 
-  console.log('Seeding products...');
+  console.log('Seeding 7 products with variations...');
 
   const products = [
     {
       name: 'Luxury Stringy Henna Powder',
       description: 'Premium quality organic henna powder with high dye content and stringy consistency for perfect application.',
-      price: 450,
       imageUrl: '/images/products/henna_powder.png',
-      categoryId: powdersCategory.id,
-      variations: [{ optionName: '1 Kg Bulk', price: 450, stock: 100 }]
+      categoryId: powders.id,
+      basePrice: 450,
+      variations: [
+        { optionName: '250g', price: 150 },
+        { optionName: '500g', price: 260 },
+        { optionName: '1 Kg', price: 450 },
+      ],
     },
     {
       name: 'Eucalyptus Essential Oil',
       description: 'Refreshing and medicinal eucalyptus oil, perfect for aromatherapy and skincare.',
-      price: 1550,
       imageUrl: '/images/products/eucalyptus_oil.png',
-      categoryId: oilsCategory.id,
-      variations: [{ optionName: '1 Litre', price: 1550, stock: 50 }]
+      categoryId: oils.id,
+      basePrice: 1550,
+      variations: [
+        { optionName: '50ml', price: 120 },
+        { optionName: '100ml', price: 220 },
+        { optionName: '250ml', price: 500 },
+        { optionName: '1 Litre', price: 1550 },
+      ],
     },
     {
       name: 'Australian Tea Tree Essential Oil',
       description: 'Pure Australian Tea Tree oil, known for its powerful antibacterial and purifying properties.',
-      price: 2550,
       imageUrl: '/images/products/tea_tree_oil.png',
-      categoryId: oilsCategory.id,
-      variations: [{ optionName: '1 Litre', price: 2550, stock: 50 }]
+      categoryId: oils.id,
+      basePrice: 2550,
+      variations: [
+        { optionName: '50ml', price: 180 },
+        { optionName: '100ml', price: 340 },
+        { optionName: '250ml', price: 790 },
+        { optionName: '1 Litre', price: 2550 },
+      ],
     },
     {
       name: 'Bulgarian Lavender Essential Oil',
       description: 'High-grade Bulgarian lavender oil with a rich, floral aroma for relaxation and skincare.',
-      price: 2750,
       imageUrl: '/images/products/lavender_oil.png',
-      categoryId: oilsCategory.id,
-      variations: [{ optionName: '1 Litre', price: 2750, stock: 50 }]
+      categoryId: oils.id,
+      basePrice: 2750,
+      variations: [
+        { optionName: '50ml', price: 200 },
+        { optionName: '100ml', price: 370 },
+        { optionName: '250ml', price: 850 },
+        { optionName: '1 Litre', price: 2750 },
+      ],
     },
     {
       name: 'Cajeput Essential Oil',
       description: 'Cajeput oil is valued for its antiseptic and clarifying properties.',
-      price: 2850,
       imageUrl: '/images/products/cajeput_oil.png',
-      categoryId: oilsCategory.id,
-      variations: [{ optionName: '1 Litre', price: 2850, stock: 50 }]
+      categoryId: oils.id,
+      basePrice: 2850,
+      variations: [
+        { optionName: '50ml', price: 210 },
+        { optionName: '100ml', price: 390 },
+        { optionName: '250ml', price: 880 },
+        { optionName: '1 Litre', price: 2850 },
+      ],
     },
     {
-      name: 'West African Raw organic Unrefined Ivory Shea Butter',
+      name: 'West African Raw Organic Unrefined Ivory Shea Butter',
       description: 'Pure, unrefined ivory shea butter from West Africa, rich in vitamins and moisture.',
-      price: 950,
       imageUrl: '/images/products/shea_butter.png',
-      categoryId: buttersCategory.id,
-      variations: [{ optionName: '1 Kg Bulk', price: 950, stock: 200 }]
+      categoryId: butters.id,
+      basePrice: 950,
+      variations: [
+        { optionName: '250g', price: 300 },
+        { optionName: '500g', price: 540 },
+        { optionName: '1 Kg', price: 950 },
+      ],
     },
     {
       name: 'Double Filtered Organic Beeswax',
       description: 'Clean, double-filtered organic beeswax, ideal for balms, candles, and skincare.',
-      price: 650,
       imageUrl: '/images/products/beeswax.png',
-      categoryId: buttersCategory.id,
-      variations: [{ optionName: '1 Kg Bulk', price: 650, stock: 100 }]
+      categoryId: butters.id,
+      basePrice: 650,
+      variations: [
+        { optionName: '250g', price: 210 },
+        { optionName: '500g', price: 370 },
+        { optionName: '1 Kg', price: 650 },
+      ],
     },
-    {
-      name: 'Pure Rose Otto Essential Oil',
-      description: 'Luxury Rose Otto oil, steam-distilled from fresh rose petals.',
-      price: 18500,
-      imageUrl: '/images/products/rose_oil.png',
-      categoryId: oilsCategory.id,
-      variations: [{ optionName: '10ml', price: 18500, stock: 10 }]
-    },
-    {
-      name: 'Cold-Pressed Moroccan Argan Oil',
-      description: 'Golden Moroccan argan oil for skin and hair health.',
-      price: 5500,
-      imageUrl: '/images/products/argan_oil.png',
-      categoryId: oilsCategory.id,
-      variations: [{ optionName: '100ml', price: 5500, stock: 20 }]
-    },
-    {
-      name: 'Organic Kasturi Turmeric Powder',
-      description: 'Traditional wild turmeric powder for a natural radiance and clear complexion.',
-      price: 850,
-      imageUrl: '/images/products/turmeric_powder.png',
-      categoryId: powdersCategory.id,
-      variations: [{ optionName: '200g', price: 850, stock: 100 }]
-    }
   ];
 
   for (const p of products) {
@@ -103,17 +114,57 @@ async function main() {
       data: {
         name: p.name,
         description: p.description,
-        price: p.price,
+        price: p.basePrice,
+        stock: DEFAULT_STOCK * p.variations.length,
         imageUrl: p.imageUrl,
         categoryId: p.categoryId,
         variations: {
-          create: p.variations
-        }
-      }
+          create: p.variations.map((v) => ({
+            optionName: v.optionName,
+            price: v.price,
+            stock: DEFAULT_STOCK,
+          })),
+        },
+      },
     });
   }
 
-  console.log('✅ Database successfully seeded with real products!');
+  console.log('Seeding admin user...');
+  const adminEmail = 'admin@niviorganics.com';
+  const adminPassword = 'admin123';
+  const hashed = await bcrypt.hash(adminPassword, 10);
+
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: { role: 'ADMIN', password: hashed },
+    create: {
+      email: adminEmail,
+      password: hashed,
+      name: 'Store Admin',
+      role: 'ADMIN',
+    },
+  });
+
+  console.log('Seeding default store settings...');
+  const defaults: Array<[string, string]> = [
+    ['PAYMENT_MANUAL_ENABLED', 'true'],
+    ['PAYMENT_STRIPE_ENABLED', 'false'],
+    ['PAYMENT_STRIPE_KEY', ''],
+    ['PAYMENT_PAYPAL_ENABLED', 'false'],
+    ['PAYMENT_PAYPAL_KEY', ''],
+    ['PAYMENT_RAZORPAY_ENABLED', 'false'],
+    ['PAYMENT_RAZORPAY_KEY', ''],
+  ];
+  for (const [key, value] of defaults) {
+    await prisma.storeSetting.upsert({
+      where: { key },
+      update: {},
+      create: { key, value },
+    });
+  }
+
+  console.log('Done.');
+  console.log(`Admin login → ${adminEmail} / ${adminPassword}`);
 }
 
 main()

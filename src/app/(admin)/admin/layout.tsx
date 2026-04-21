@@ -1,15 +1,22 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import './admin.css'; // We'll create specific admin styles here
 
 export const metadata = {
   title: 'Admin - Nivi Organics',
 };
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
+  if (!session) redirect('/login?callbackUrl=/admin/dashboard');
+  if (session.user?.role !== 'ADMIN') redirect('/');
+
   return (
     <div className="admin-layout">
       {/* Sidebar */}

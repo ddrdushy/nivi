@@ -1,26 +1,31 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/auth-guard';
 
-const prisma = new PrismaClient();
+const ALLOWED_KEYS = [
+  'PAYMENT_MANUAL_ENABLED',
+  'PAYMENT_STRIPE_ENABLED',
+  'PAYMENT_STRIPE_KEY',
+  'PAYMENT_PAYPAL_ENABLED',
+  'PAYMENT_PAYPAL_KEY',
+  'PAYMENT_RAZORPAY_ENABLED',
+  'PAYMENT_RAZORPAY_KEY',
+] as const;
 
 export async function updatePaymentSettings(formData: FormData) {
-  const settings = [
-    { key: 'PAYMENT_MANUAL_ENABLED', val: formData.get('PAYMENT_MANUAL_ENABLED') === 'on' ? 'true' : 'false' },
-    { key: 'PAYMENT_STRIPE_ENABLED', val: formData.get('PAYMENT_STRIPE_ENABLED') === 'on' ? 'true' : 'false' },
-    { key: 'PAYMENT_STRIPE_KEY', val: formData.get('PAYMENT_STRIPE_KEY') as string || '' },
-    { key: 'PAYMENT_PAYPAL_ENABLED', val: formData.get('PAYMENT_PAYPAL_ENABLED') === 'on' ? 'true' : 'false' },
-    { key: 'PAYMENT_PAYPAL_KEY', val: formData.get('PAYMENT_PAYPAL_KEY') as string || '' },
-    { key: 'PAYMENT_RAZORPAY_ENABLED', val: formData.get('PAYMENT_RAZORPAY_ENABLED') === 'on' ? 'true' : 'false' },
-    { key: 'PAYMENT_RAZORPAY_KEY', val: formData.get('PAYMENT_RAZORPAY_KEY') as string || '' },
-  ];
+  await requireAdmin();
 
-  for (const setting of settings) {
+  for (const key of ALLOWED_KEYS) {
+    const isToggle = key.endsWith('_ENABLED');
+    const raw = formData.get(key);
+    const value = isToggle ? (raw === 'on' ? 'true' : 'false') : String(raw ?? '');
+
     await prisma.storeSetting.upsert({
-      where: { key: setting.key },
-      update: { value: setting.val },
-      create: { key: setting.key, value: setting.val }
+      where: { key },
+      update: { value },
+      create: { key, value },
     });
   }
 
