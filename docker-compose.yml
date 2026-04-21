@@ -11,20 +11,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   app:
     build: .
     ports:
-      - "3000:3000"
+      - "3010:3000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgrespassword@db:5432/niviorganics?schema=public
       - NEXTAUTH_SECRET=supersecret123
-      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_URL=http://localhost:3010
     depends_on:
-      - db
-    # Override standard start to ensure database migration runs first
-    command: /bin/sh -c "npx prisma db push && npm start"
+      db:
+        condition: service_healthy
+    command: /bin/sh -c "npx prisma db push && npm run build && npm start"
 
 volumes:
   postgres_data:
