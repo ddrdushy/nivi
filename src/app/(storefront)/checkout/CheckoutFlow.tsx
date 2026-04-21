@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
-import { placeOrder } from '@/app/actions/checkout';
+import { placeOrder, validateCoupon } from '@/app/actions/checkout';
 
 type Props = {
   paymentConfig: any;
@@ -17,6 +17,11 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Coupon State
+  const [couponCode, setCouponCode] = useState('');
+  const [activeCoupon, setActiveCoupon] = useState<any>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -33,8 +38,23 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
   const activeTaxRate = taxZones.find(t => t.region.toLowerCase() === formData.state.toLowerCase())?.rate || 0;
   const activeShipping = shippingZones.find(s => s.regions.toLowerCase().includes(formData.state.toLowerCase()))?.baseRate || 0;
 
-  const taxTotal = (subtotal * activeTaxRate) / 100;
-  const total = subtotal + taxTotal + activeShipping;
+  const discountTotal = activeCoupon?.discountAmount || 0;
+  const taxTotal = ((subtotal - discountTotal) * activeTaxRate) / 100;
+  const total = Math.max(0, subtotal - discountTotal + taxTotal + activeShipping);
+
+  const handleApplyCoupon = async () => {
+    setActiveCoupon(null);
+    setCouponError(null);
+    
+    if (!couponCode) return;
+
+    const result = await validateCoupon(couponCode, subtotal);
+    if (result.success) {
+      setActiveCoupon(result.coupon);
+    } else {
+      setCouponError(result.error || 'Failed to apply coupon.');
+    }
+  };
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -46,6 +66,8 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
       customerPhone: formData.phone,
       address: `${formData.address}, ${formData.state}, ${formData.zipCode}`,
       subtotal,
+      discountTotal,
+      couponId: activeCoupon?.id,
       taxTotal,
       shippingTotal: activeShipping,
       total,
@@ -102,9 +124,27 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
           <h2 style={{ marginBottom: '24px', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px', fontSize: '18px', textTransform: 'uppercase', letterSpacing: '1px' }}>
             2. Order Summary & Discounts
           </h2>
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-            <input type="text" className="input-base" placeholder="Enter Promo Code (e.g. SUMMER10)" style={{ borderRadius: '0', textTransform: 'uppercase' }} />
-            <button className="btn-outline" style={{ padding: '0 24px', borderRadius: '0' }}>Apply</button>
+          
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <input 
+                type="text" 
+                className="input-base" 
+                placeholder="Enter Promo Code (e.g. SUMMER10)" 
+                style={{ borderRadius: '0', textTransform: 'uppercase' }} 
+                value={couponCode}
+                onChange={e => setCouponCode(e.target.value)}
+              />
+              <button 
+                className="btn-outline" 
+                style={{ padding: '0 24px', borderRadius: '0' }}
+                onClick={handleApplyCoupon}
+              >
+                Apply
+              </button>
+            </div>
+            {couponError && <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '8px' }}>{couponError}</div>}
+            {activeCoupon && <div style={{ color: 'var(--color-primary)', fontSize: '12px', marginTop: '8px' }}>✓ Coupon applied: {activeCoupon.code} ({activeCoupon.discountType === 'PERCENTAGE' ? `${activeCoupon.value}%` : `Rs. ${activeCoupon.value}`})</div>}
           </div>
           
           <div style={{ backgroundColor: '#f9f9f9', padding: '16px', border: '1px solid var(--color-border)' }}>
@@ -112,6 +152,14 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
               <span>Items Total ({totalItems})</span>
               <span>Rs. {subtotal.toLocaleString()}</span>
             </div>
+            
+            {discountTotal > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', color: 'var(--color-primary)', fontWeight: '600' }}>
+                <span>Discount Applied</span>
+                <span>- Rs. {discountTotal.toLocaleString()}</span>
+              </div>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
               <span>Shipping to {formData.state || 'Region'}</span>
               <span>Rs. {activeShipping.toLocaleString()}</span>
@@ -139,7 +187,7 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {paymentConfig.manual && (
               <label style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', border: '1px solid var(--color-border)', cursor: 'pointer' }}>
-                <input type="radio" name="payment_method" value="MANUAL" defaultChecked />
+                <input type="radio" name="payment_method" value="MANUAL" checked={formData.paymentMethod === 'MANUAL'} onChange={() => setFormData({...formData, paymentMethod: 'MANUAL'})} />
                 <div>
                   <strong style={{ display: 'block', fontSize: '14px', textTransform: 'uppercase' }}>Cash on Delivery</strong>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Pay with cash upon delivery</span>
