@@ -20,7 +20,7 @@ export default function NavIcons({ role }: { role: UserRole | null }) {
     if (role === 'CUSTOMER') {
       return { href: '/account', label: 'Account' };
     }
-    return { href: '/login', label: 'Sign In' };
+    return { href: '/login', label: 'Login' };
   })();
 
   return (
