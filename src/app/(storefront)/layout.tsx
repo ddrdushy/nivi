@@ -13,6 +13,20 @@ export default function StorefrontLayout({
   return (
     <CartProvider>
       <WishlistProvider>
+        {/* ─── ANNOUNCEMENT BAR ─── */}
+        <div style={{
+          backgroundColor: 'var(--color-gold)',
+          color: '#fff',
+          fontSize: '12px',
+          fontWeight: 500,
+          letterSpacing: '1px',
+          textTransform: 'uppercase',
+          textAlign: 'center',
+          padding: '8px 16px',
+        }}>
+          ✨ Free shipping on orders over Rs.5,000 · 100% Pure &amp; Natural · Ships worldwide
+        </div>
+
         {/* ─── TOP NAV ─── */}
         <header style={{
           backgroundColor: 'var(--color-nav-bg)',
