@@ -144,41 +144,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── LATEST BLOGS ─── */}
-      <section style={{ padding: '80px 0' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <p style={{ color: 'var(--color-primary)', fontSize: '24px', marginBottom: '8px' }}>🌿</p>
-            <h2 style={{ fontSize: '32px', color: 'var(--color-text-main)', marginBottom: '8px' }}>Latest from the Blog</h2>
-            <p style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>Tips, guides and stories about natural beauty and wellness.</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-            {[
-              { emoji: '🌺', category: 'Skin Care', title: '5 Essential Oils for Glowing Skin', date: 'April 15, 2026' },
-              { emoji: '🧖', category: 'Wellness', title: 'How to Create a Natural Skincare Routine', date: 'April 10, 2026' },
-              { emoji: '🌿', category: 'Ingredients', title: 'The Benefits of Raw Shea Butter', date: 'April 5, 2026' },
-            ].map((post, i) => (
-              <div key={i} style={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
-                <div style={{
-                  height: '220px',
-                  backgroundImage: `url("/images/decorations/blog_${i + 1}.png")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}></div>
-                <div style={{ padding: '20px' }}>
-                  <p style={{ color: 'var(--color-primary)', fontSize: '11px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '8px' }}>
-                    {post.category}
-                  </p>
-                  <h4 style={{ fontSize: '16px', color: 'var(--color-text-main)', marginBottom: '8px', lineHeight: 1.4 }}>
-                    {post.title}
-                  </h4>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{post.date}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
