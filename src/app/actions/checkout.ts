@@ -1,6 +1,8 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
+import { sendEmail, loadEmailSettings } from '@/lib/email';
+import { customerOrderConfirmation, adminOrderNotification } from '@/lib/emailTemplates';
 
 export async function validateCoupon(code: string, subtotal: number) {
   try {
@@ -128,9 +130,63 @@ export async function placeOrder(orderData: {
       return order;
     });
 
+    // Fire-and-forget emails — never block the sale if SMTP is down/misconfigured.
+    void sendOrderEmails(result.id).catch((e) => console.error('Order emails failed:', e));
+
     return { success: true, orderId: result.id };
   } catch (error: any) {
     console.error('Checkout error:', error);
     return { success: false, error: error.message || 'Something went wrong during checkout.' };
   }
+}
+
+async function sendOrderEmails(orderId: string): Promise<void> {
+  const settings = await loadEmailSettings();
+  if (!settings.enabled) return;
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { items: true },
+  });
+  if (!order) return;
+
+  const orderForEmail = {
+    id: order.id,
+    customerName: order.customerName,
+    customerEmail: order.customerEmail,
+    customerPhone: order.customerPhone,
+    address: order.address,
+    items: order.items.map((i) => ({ productName: i.productName, quantity: i.quantity, price: i.price })),
+    subtotal: order.subtotal,
+    discountTotal: order.discountTotal,
+    taxTotal: order.taxTotal,
+    shippingTotal: order.shippingTotal,
+    total: order.total,
+    status: order.status,
+    paymentMethod: order.paymentMethod,
+  };
+
+  // Customer confirmation
+  const customer = customerOrderConfirmation(orderForEmail);
+  const customerRes = await sendEmail({
+    to: order.customerEmail,
+    subject: customer.subject,
+    html: customer.html,
+    text: customer.text,
+  });
+  if (!customerRes.ok) console.error('Customer order email failed:', customerRes.error);
+
+  // Admin notification
+  const notifySetting = await prisma.storeSetting.findUnique({ where: { key: 'ORDER_NOTIFY_EMAIL' } });
+  const notifyTo = notifySetting?.value?.trim() || settings.fromAddress;
+  if (!notifyTo) return;
+
+  const admin = adminOrderNotification(orderForEmail);
+  const adminRes = await sendEmail({
+    to: notifyTo,
+    subject: admin.subject,
+    html: admin.html,
+    text: admin.text,
+  });
+  if (!adminRes.ok) console.error('Admin order email failed:', adminRes.error);
 }

@@ -22,6 +22,7 @@ type Current = {
   pass: string;
   fromName: string;
   fromAddress: string;
+  orderNotifyEmail: string;
 };
 
 export default function EmailSettingsForm({
@@ -40,6 +41,7 @@ export default function EmailSettingsForm({
   const [pass, setPass] = useState('');
   const [fromName, setFromName] = useState(current.fromName);
   const [fromAddress, setFromAddress] = useState(current.fromAddress);
+  const [orderNotifyEmail, setOrderNotifyEmail] = useState(current.orderNotifyEmail);
   const [saveStatus, setSaveStatus] = useState<null | { ok: boolean; msg: string }>(null);
   const [isSaving, startSave] = useTransition();
 
@@ -225,6 +227,22 @@ export default function EmailSettingsForm({
               placeholder="hello@niviorganics.com"
             />
           </div>
+        </div>
+
+        <div style={rowStyle}>
+          <label style={labelStyle}>Order Notification Email</label>
+          <input
+            name="ORDER_NOTIFY_EMAIL"
+            type="email"
+            value={orderNotifyEmail}
+            onChange={(e) => setOrderNotifyEmail(e.target.value)}
+            className="input-base"
+            style={inputStyle}
+            placeholder="orders@niviorganics.com"
+          />
+          <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+            Where new-order alerts are sent. Leave blank to fall back to From Address.
+          </p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '24px' }}>

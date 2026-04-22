@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth-guard';
 import { z } from 'zod';
-import { EMAIL_SETTING_KEYS, loadEmailSettings, sendEmailWithSettings } from '@/lib/email';
+import { loadEmailSettings, sendEmailWithSettings } from '@/lib/email';
 
 const PAYMENT_KEYS = [
   'PAYMENT_MANUAL_ENABLED',
@@ -47,6 +47,7 @@ const emailFormSchema = z.object({
   EMAIL_PASS: z.string(),
   EMAIL_FROM_NAME: z.string().trim(),
   EMAIL_FROM_ADDRESS: z.string().trim(),
+  ORDER_NOTIFY_EMAIL: z.string().trim(),
 });
 
 export async function updateEmailSettings(formData: FormData) {
@@ -62,6 +63,7 @@ export async function updateEmailSettings(formData: FormData) {
     EMAIL_PASS: formData.get('EMAIL_PASS') ?? '',
     EMAIL_FROM_NAME: formData.get('EMAIL_FROM_NAME') ?? '',
     EMAIL_FROM_ADDRESS: formData.get('EMAIL_FROM_ADDRESS') ?? '',
+    ORDER_NOTIFY_EMAIL: formData.get('ORDER_NOTIFY_EMAIL') ?? '',
   });
 
   // Password field is shown empty — only overwrite on explicit non-empty input.
@@ -70,7 +72,7 @@ export async function updateEmailSettings(formData: FormData) {
     ? existing.pass
     : parsed.EMAIL_PASS;
 
-  const pairs: Array<[(typeof EMAIL_SETTING_KEYS)[number], string]> = [
+  const pairs: Array<[string, string]> = [
     ['EMAIL_ENABLED', parsed.EMAIL_ENABLED ? 'true' : 'false'],
     ['EMAIL_PROVIDER', parsed.EMAIL_PROVIDER],
     ['EMAIL_HOST', parsed.EMAIL_HOST],
@@ -80,6 +82,7 @@ export async function updateEmailSettings(formData: FormData) {
     ['EMAIL_PASS', nextPass],
     ['EMAIL_FROM_NAME', parsed.EMAIL_FROM_NAME],
     ['EMAIL_FROM_ADDRESS', parsed.EMAIL_FROM_ADDRESS],
+    ['ORDER_NOTIFY_EMAIL', parsed.ORDER_NOTIFY_EMAIL],
   ];
 
   for (const [key, value] of pairs) {

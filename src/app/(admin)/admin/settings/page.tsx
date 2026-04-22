@@ -18,6 +18,9 @@ export default async function SettingsPage() {
   const razorpayKey = getSetting('PAYMENT_RAZORPAY_KEY');
 
   const email = await loadEmailSettings();
+  const orderNotifyRow = await prisma.storeSetting.findUnique({ where: { key: 'ORDER_NOTIFY_EMAIL' } });
+  const emailWithNotify = { ...email, orderNotifyEmail: orderNotifyRow?.value ?? '' };
+
   const presets = Object.entries(PROVIDER_PRESETS).map(([value, preset]) => ({
     value,
     label: preset?.label ?? 'Custom SMTP',
@@ -103,7 +106,7 @@ export default async function SettingsPage() {
           <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', marginBottom: '24px' }}>
             Used for password reset, order confirmations, and any transactional message the store sends.
           </p>
-          <EmailSettingsForm current={email} presets={presets} />
+          <EmailSettingsForm current={emailWithNotify} presets={presets} />
         </div>
       </div>
     </div>
