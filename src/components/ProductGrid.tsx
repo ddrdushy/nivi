@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProductCard from './ProductCard';
 
@@ -24,7 +25,21 @@ export default function ProductGrid({
   products: Product[];
   categories: Category[];
 }) {
-  const [active, setActive] = useState<string>(ALL);
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category');
+  const [active, setActive] = useState<string>(() => {
+    if (initialCategory && categories.some((c) => c.name === initialCategory)) {
+      return initialCategory;
+    }
+    return ALL;
+  });
+
+  // Keep the tab in sync if the user navigates with different category params
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat && categories.some((c) => c.name === cat)) setActive(cat);
+    if (!cat) setActive(ALL);
+  }, [searchParams, categories]);
 
   const visible = useMemo(() => {
     if (active === ALL) return products;

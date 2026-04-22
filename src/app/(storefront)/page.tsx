@@ -1,6 +1,8 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import ProductGrid from '@/components/ProductGrid';
 import HeroSlider from '@/components/HeroSlider';
+import CategoryTiles from '@/components/CategoryTiles';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -11,13 +13,29 @@ export default async function HomePage() {
       include: { category: true },
       orderBy: { createdAt: 'desc' },
     }),
-    prisma.category.findMany({ orderBy: { name: 'asc' } }),
+    prisma.category.findMany({
+      orderBy: { name: 'asc' },
+      include: {
+        products: { select: { imageUrl: true }, take: 1 },
+        _count: { select: { products: true } },
+      },
+    }),
   ]);
+
+  const tiles = categories.map((c) => ({
+    id: c.id,
+    name: c.name,
+    productCount: c._count.products,
+    imageUrl: c.products[0]?.imageUrl ?? c.imageUrl,
+  }));
 
   return (
     <div>
       {/* ─── HERO SLIDER ─── */}
       <HeroSlider />
+
+      {/* ─── POPULAR CATEGORIES ─── */}
+      <CategoryTiles tiles={tiles} />
 
       {/* ─── FEATURES STRIP ─── */}
       <section style={{ backgroundColor: 'var(--color-dark)', padding: '20px 0' }}>
@@ -66,7 +84,9 @@ export default async function HomePage() {
             <p style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>Add our products to your daily wellness line up</p>
           </div>
 
-          <ProductGrid products={products} categories={categories} />
+          <Suspense fallback={<div style={{ minHeight: '400px' }} />}>
+            <ProductGrid products={products} categories={categories} />
+          </Suspense>
         </div>
       </section>
 
