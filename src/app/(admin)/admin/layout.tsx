@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import SignOutButton from '@/components/SignOutButton';
 import './admin.css'; // We'll create specific admin styles here
 
 export const metadata = {
@@ -70,8 +71,14 @@ export default async function AdminLayout({
               />
               <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }}>🔍</span>
             </div>
-            <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-              A
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div
+                title={session.user?.email ?? 'Admin'}
+                style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}
+              >
+                {(session.user?.name || session.user?.email || 'A').charAt(0).toUpperCase()}
+              </div>
+              <SignOutButton />
             </div>
           </div>
         </header>

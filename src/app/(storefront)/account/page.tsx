@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import LogoutButton from "./LogoutButton";
+import SignOutButton from "@/components/SignOutButton";
 import AddressBook from "./AddressBook";
 
 export const metadata: Metadata = {
@@ -42,7 +42,7 @@ export default async function AccountPage() {
     <div className="container" style={{ padding: '80px 24px', maxWidth: '800px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid var(--color-border)', paddingBottom: '24px' }}>
         <h1 style={{ fontSize: '32px' }}>My Account</h1>
-        <LogoutButton />
+        <SignOutButton />
       </div>
 
       <div style={{ marginBottom: '48px' }}>
