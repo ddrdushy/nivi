@@ -82,9 +82,9 @@ export default async function DashboardPage() {
 
       {/* Counter Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
-        <StatCard label="Total Revenue" value={`Rs. ${totalRevenue.toLocaleString()}`} trend={{ value: 12, isUp: true }} icon="💰" />
-        <StatCard label="Total Orders" value={ordersCount} trend={{ value: 8, isUp: true }} icon="📦" />
-        <StatCard label="Customers" value={customersCount} trend={{ value: 5, isUp: true }} icon="👥" />
+        <StatCard label="Total Revenue" value={`Rs. ${totalRevenue.toLocaleString()}`} icon="💰" />
+        <StatCard label="Total Orders" value={ordersCount} icon="📦" />
+        <StatCard label="Customers" value={customersCount} icon="👥" />
         <StatCard label="Avg. Order Value" value={`Rs. ${aov.toLocaleString()}`} icon="📈" />
       </div>
 
