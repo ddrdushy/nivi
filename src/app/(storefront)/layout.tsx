@@ -37,38 +37,36 @@ export default function StorefrontLayout({
           <div className="container" style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            height: '60px',
+            gap: '48px',
+            height: '72px',
           }}>
-            {/* Left Nav */}
-            <nav style={{ display: 'flex', gap: '28px', alignItems: 'center' }}>
-              <Link href="/" style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>Home</Link>
-              <Link href="/" style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>Collections</Link>
-              <Link href="/" style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>Skin Care</Link>
-              <Link href="/" style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>About Us</Link>
-            </nav>
-
-            {/* Center Logo */}
+            {/* Logo — left */}
             <Link href="/" style={{
-              position: 'absolute',
-              left: '50%',
-              transform: 'translateX(-50%)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
+              flexShrink: 0,
             }}>
               <span style={{ fontSize: '24px' }}>🌿</span>
               <span style={{
                 color: '#fff',
-                fontSize: '22px',
-                fontWeight: '700',
+                fontSize: '20px',
+                fontWeight: 700,
                 letterSpacing: '2px',
               }}>
                 NIVI ORGANICS
               </span>
             </Link>
 
-            {/* Right Icons */}
+            {/* Main nav — center */}
+            <nav style={{ display: 'flex', gap: '32px', alignItems: 'center', flex: 1 }}>
+              <Link href="/" style={{ color: '#fff', fontSize: '14px', fontWeight: 500, letterSpacing: '0.5px' }}>Home</Link>
+              <Link href="/#products" style={{ color: '#fff', fontSize: '14px', fontWeight: 500, letterSpacing: '0.5px' }}>Shop</Link>
+              <Link href="/about" style={{ color: '#fff', fontSize: '14px', fontWeight: 500, letterSpacing: '0.5px' }}>About</Link>
+              <Link href="/contact" style={{ color: '#fff', fontSize: '14px', fontWeight: 500, letterSpacing: '0.5px' }}>Contact</Link>
+            </nav>
+
+            {/* Icons — right */}
             <NavIcons />
           </div>
         </header>
