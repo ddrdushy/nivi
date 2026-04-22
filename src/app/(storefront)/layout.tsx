@@ -3,6 +3,7 @@ import CookieBanner from '@/components/CookieBanner';
 import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import NavIcons from '@/components/NavIcons';
+import NewsletterForm from '@/components/NewsletterForm';
 
 export default function StorefrontLayout({
   children,
@@ -125,37 +126,7 @@ export default function StorefrontLayout({
               <p style={{ fontSize: '13px', color: '#888', marginBottom: '20px' }}>
                 You may unsubscribe at any moment. For that purpose, please find our contact info in the legal notice.
               </p>
-              <div style={{ display: 'flex', gap: '0' }}>
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  style={{
-                    flex: 1,
-                    padding: '13px 20px',
-                    backgroundColor: '#111',
-                    border: '1px solid #333',
-                    borderRight: 'none',
-                    borderRadius: '50px 0 0 50px',
-                    fontSize: '14px',
-                    color: '#fff',
-                    outline: 'none',
-                    fontFamily: 'inherit',
-                  }}
-                />
-                <button style={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: '#fff',
-                  padding: '13px 24px',
-                  borderRadius: '0 50px 50px 0',
-                  fontWeight: '700',
-                  fontSize: '12px',
-                  letterSpacing: '1px',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}>
-                  SIGN UP
-                </button>
-              </div>
+              <NewsletterForm />
             </div>
           </div>
 

@@ -136,3 +136,9 @@ model TaxZone {
   rate      Float    // e.g. 7.5 for 7.5%
   isActive  Boolean  @default(true)
 }
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
