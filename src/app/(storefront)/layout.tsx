@@ -5,12 +5,16 @@ import { WishlistProvider } from '@/context/WishlistContext';
 import NavIcons from '@/components/NavIcons';
 import NewsletterForm from '@/components/NewsletterForm';
 import { JsonLd, organizationJsonLd } from '@/lib/jsonLd';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
-export default function StorefrontLayout({
+export default async function StorefrontLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
+  const role = session?.user?.role ?? null;
   return (
     <CartProvider>
       <WishlistProvider>
@@ -69,7 +73,7 @@ export default function StorefrontLayout({
             </nav>
 
             {/* Icons — right */}
-            <NavIcons />
+            <NavIcons role={role} />
           </div>
         </header>
 

@@ -6,10 +6,22 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useState } from 'react';
 import CartDrawer from './CartDrawer';
 
-export default function NavIcons() {
+type UserRole = 'ADMIN' | 'CUSTOMER';
+
+export default function NavIcons({ role }: { role: UserRole | null }) {
   const { totalItems, subtotal } = useCart();
   const { wishlist } = useWishlist();
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const accountPill = (() => {
+    if (role === 'ADMIN') {
+      return { href: '/admin/dashboard', label: 'Admin' };
+    }
+    if (role === 'CUSTOMER') {
+      return { href: '/account', label: 'Account' };
+    }
+    return { href: '/login', label: 'Sign In' };
+  })();
 
   return (
     <>
@@ -58,14 +70,17 @@ export default function NavIcons() {
           <span style={{ fontSize: '13px', fontWeight: '500' }}>Rs. {subtotal.toLocaleString()}</span>
         </button>
 
-        <Link href="/admin" style={{
+        <Link href={accountPill.href} style={{
           color: '#fff',
           fontSize: '11px',
+          fontWeight: 600,
+          letterSpacing: '1px',
+          textTransform: 'uppercase',
           border: '1px solid rgba(255,255,255,0.3)',
           borderRadius: '4px',
           padding: '4px 10px',
           transition: 'all 0.2s',
-        }}>Admin</Link>
+        }}>{accountPill.label}</Link>
       </div>
 
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

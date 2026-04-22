@@ -1,8 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import RoleToggle from './RoleToggle';
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await getServerSession(authOptions);
   const { id } = await params;
   const user = await prisma.user.findUnique({
     where: { id },
@@ -111,17 +115,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>Role</label>
-                <div style={{ 
-                  display: 'inline-block',
-                  fontSize: '11px', 
-                  fontWeight: '700', 
-                  backgroundColor: user.role === 'ADMIN' ? '#fee2e2' : '#e0e7ff',
-                  color: user.role === 'ADMIN' ? '#dc2626' : '#4338ca',
-                  padding: '2px 8px',
-                  borderRadius: '10px'
-                }}>
-                  {user.role}
-                </div>
+                <RoleToggle
+                  userId={user.id}
+                  currentRole={user.role as 'ADMIN' | 'CUSTOMER'}
+                  isSelf={session?.user?.id === user.id}
+                />
               </div>
             </div>
           </div>

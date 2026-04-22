@@ -18,6 +18,11 @@ export default async function AccountPage() {
     redirect("/login");
   }
 
+  // Admins don't have a customer account view — send them to the admin panel.
+  if (session.user.role === "ADMIN") {
+    redirect("/admin/dashboard");
+  }
+
   const userId = session.user.id;
 
   const [orders, addresses] = await Promise.all([
