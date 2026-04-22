@@ -48,11 +48,16 @@ export default function LoginPage() {
         </div>
         
         <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '700', fontSize: '14px', textTransform: 'uppercase' }}>Password</label>
-          <input 
-            type="password" 
-            required 
-            className="input-base" 
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <label style={{ fontWeight: 700, fontSize: '14px', textTransform: 'uppercase' }}>Password</label>
+            <Link href="/forgot-password" style={{ fontSize: '12px', color: 'var(--color-primary)', fontWeight: 600 }}>
+              Forgot?
+            </Link>
+          </div>
+          <input
+            type="password"
+            required
+            className="input-base"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -64,7 +69,7 @@ export default function LoginPage() {
       </form>
 
       <div style={{ textAlign: 'center', marginTop: '32px', color: 'var(--color-text-muted)' }}>
-        Don't have an account? <Link href="/register" style={{ color: 'var(--color-primary)', fontWeight: '700' }}>Create one here</Link>
+        Don&apos;t have an account? <Link href="/register" style={{ color: 'var(--color-primary)', fontWeight: '700' }}>Create one here</Link>
       </div>
     </div>
   );

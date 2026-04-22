@@ -45,15 +45,29 @@ model ProductVariation {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  role      String    @default("CUSTOMER") // ADMIN or CUSTOMER
-  name      String?
-  addresses Address[]
-  orders    Order[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id             String                @id @default(uuid())
+  email          String                @unique
+  password       String
+  role           String                @default("CUSTOMER") // ADMIN or CUSTOMER
+  name           String?
+  addresses      Address[]
+  orders         Order[]
+  resetTokens    PasswordResetToken[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+}
+
+model PasswordResetToken {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Address {
