@@ -85,24 +85,26 @@ model Address {
 }
 
 model Order {
-  id            String      @id @default(uuid())
-  userId        String?
-  user          User?       @relation(fields: [userId], references: [id])
-  customerName  String
-  customerEmail String
-  customerPhone String?
-  address       String?
-  subtotal      Float       @default(0)
-  taxTotal      Float       @default(0)
-  shippingTotal Float       @default(0)
-  discountTotal Float       @default(0)
-  total         Float
-  status        String      @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED
-  paymentMethod String      @default("MANUAL")
-  items         OrderItem[]
-  couponCode    String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id             String      @id @default(uuid())
+  userId         String?
+  user           User?       @relation(fields: [userId], references: [id])
+  customerName   String
+  customerEmail  String
+  customerPhone  String?
+  address        String?
+  subtotal       Float       @default(0)
+  taxTotal       Float       @default(0)
+  shippingTotal  Float       @default(0)
+  discountTotal  Float       @default(0)
+  total          Float
+  status         String      @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED, CANCELLED
+  paymentMethod  String      @default("MANUAL")
+  trackingNumber String?
+  trackingUrl    String?
+  items          OrderItem[]
+  couponCode     String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 }
 
 model OrderItem {

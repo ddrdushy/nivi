@@ -119,7 +119,12 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
           {/* Status Updater (Client Component) */}
-          <OrderStatusUpdater orderId={order.id} currentStatus={order.status} />
+          <OrderStatusUpdater
+            orderId={order.id}
+            currentStatus={order.status}
+            currentTrackingNumber={order.trackingNumber}
+            currentTrackingUrl={order.trackingUrl}
+          />
 
           {/* Customer Info */}
           <div className="stat-card" style={{ padding: '20px' }}>

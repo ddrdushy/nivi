@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -58,7 +59,19 @@ export default async function AccountPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {orders.map((order) => (
-            <div key={order.id} style={{ border: '1px solid var(--color-border)', padding: '24px', borderRadius: 'var(--radius-sm)' }}>
+            <Link
+              key={order.id}
+              href={`/account/orders/${order.id}`}
+              style={{
+                display: 'block',
+                border: '1px solid var(--color-border)',
+                padding: '24px',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: '#fff',
+                transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+              }}
+              className="order-card"
+            >
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px' }}>
                 <div>
                   <strong>Order #{order.id.substring(0, 8).toUpperCase()}</strong>
@@ -67,26 +80,29 @@ export default async function AccountPage() {
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <span style={{ 
-                    display: 'inline-block', 
-                    padding: '4px 12px', 
-                    backgroundColor: order.status === 'DELIVERED' ? '#c9d2b7' : '#E5E5E5',
-                    color: '#0F0F0F',
-                    fontSize: '10px',
-                    fontWeight: '700',
-                    letterSpacing: '1px'
-                  }}>
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      padding: '4px 12px',
+                      backgroundColor: order.status === 'DELIVERED' ? '#c9d2b7' : '#E5E5E5',
+                      color: '#0F0F0F',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     {order.status}
                   </span>
-                  <div style={{ marginTop: '8px', fontWeight: '700' }}>
-                    Rs. {order.total}
-                  </div>
+                  <div style={{ marginTop: '8px', fontWeight: '700' }}>Rs. {order.total}</div>
                 </div>
               </div>
-              <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>
-                {order.items.length} item(s) purchased.
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px', color: 'var(--color-text-muted)' }}>
+                <span>{order.items.length} item(s) purchased.</span>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: '13px' }}>
+                  View details →
+                </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
