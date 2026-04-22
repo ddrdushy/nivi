@@ -1,5 +1,8 @@
 'use server';
 
+import bcrypt from 'bcryptjs';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { sendEmail, loadEmailSettings } from '@/lib/email';
 import { customerOrderConfirmation, adminOrderNotification } from '@/lib/emailTemplates';
@@ -64,6 +67,7 @@ export async function placeOrder(orderData: {
   paymentMethod: string;
   couponId?: string;
   discountTotal?: number;
+  password?: string;
   items: {
     productId: string;
     variationId?: string;
@@ -73,13 +77,68 @@ export async function placeOrder(orderData: {
   }[];
 }) {
   try {
+    const email = orderData.customerEmail.trim().toLowerCase();
+    const phone = orderData.customerPhone.trim();
+    const name = orderData.customerName.trim();
+
+    if (!email) return { success: false, error: 'Email is required.' };
+    if (!phone) return { success: false, error: 'Phone number is required.' };
+    if (!name) return { success: false, error: 'Name is required.' };
+
+    const session = await getServerSession(authOptions);
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+
+    let userId: string | null = null;
+    let accountCreated = false;
+    let linkedExistingAccount = false;
+
+    if (session?.user?.id) {
+      // Logged in: always link to current session user, regardless of email typed.
+      userId = session.user.id;
+      // Backfill name/phone on the user if missing.
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          phone: phone,
+          ...(name && !session.user.name ? { name } : {}),
+        },
+      });
+    } else if (existingUser) {
+      // Guest checkout with an email that already has an account.
+      // Link the order to that account but do NOT touch their password.
+      userId = existingUser.id;
+      linkedExistingAccount = true;
+      if (!existingUser.phone) {
+        await prisma.user.update({ where: { id: userId }, data: { phone } });
+      }
+    } else {
+      // New guest — require password to create an account.
+      const password = orderData.password ?? '';
+      if (password.length < 6) {
+        return { success: false, error: 'Please choose a password (at least 6 characters) to create your account.' };
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const created = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name: name || null,
+          phone,
+          role: 'CUSTOMER',
+        },
+      });
+      userId = created.id;
+      accountCreated = true;
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       // 1. Create the Order
       const order = await tx.order.create({
         data: {
-          customerName: orderData.customerName,
-          customerEmail: orderData.customerEmail,
-          customerPhone: orderData.customerPhone,
+          userId,
+          customerName: name,
+          customerEmail: email,
+          customerPhone: phone,
           address: orderData.address,
           subtotal: orderData.subtotal,
           taxTotal: orderData.taxTotal,
@@ -133,7 +192,7 @@ export async function placeOrder(orderData: {
     // Fire-and-forget emails — never block the sale if SMTP is down/misconfigured.
     void sendOrderEmails(result.id).catch((e) => console.error('Order emails failed:', e));
 
-    return { success: true, orderId: result.id };
+    return { success: true, orderId: result.id, accountCreated, linkedExistingAccount };
   } catch (error: any) {
     console.error('Checkout error:', error);
     return { success: false, error: error.message || 'Something went wrong during checkout.' };

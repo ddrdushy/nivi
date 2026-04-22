@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import { placeOrder, validateCoupon } from '@/app/actions/checkout';
@@ -9,9 +10,11 @@ type Props = {
   paymentConfig: any;
   shippingZones: any[];
   taxZones: any[];
+  isLoggedIn: boolean;
+  customer: { name: string; email: string; phone: string } | null;
 }
 
-export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }: Props) {
+export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones, isLoggedIn, customer }: Props) {
   const router = useRouter();
   const { cart, subtotal, totalItems, clearCart } = useCart();
   const [step, setStep] = useState(1);
@@ -23,16 +26,19 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
   const [activeCoupon, setActiveCoupon] = useState<any>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
 
-  // Form State
+  // Prefill from logged-in user if available.
+  const [firstPrefill, lastPrefill] = (customer?.name ?? '').split(' ');
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
+    firstName: firstPrefill ?? '',
+    lastName: lastPrefill ?? '',
+    email: customer?.email ?? '',
     address: '',
     state: '',
     zipCode: '',
-    phone: '',
-    paymentMethod: 'MANUAL'
+    phone: customer?.phone ?? '',
+    paymentMethod: 'MANUAL',
+    password: '',
+    confirmPassword: '',
   });
 
   const activeTaxRate = taxZones.find(t => t.region.toLowerCase() === formData.state.toLowerCase())?.rate || 0;
@@ -56,14 +62,36 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
     }
   };
 
+  const validateStep1 = () => {
+    if (!formData.firstName.trim() || !formData.lastName.trim()) return 'Please enter your first and last name.';
+    if (!formData.email.trim()) return 'Email is required.';
+    if (!formData.phone.trim()) return 'Phone number is required.';
+    if (!formData.address.trim() || !formData.state.trim() || !formData.zipCode.trim()) return 'Please complete the shipping address.';
+    if (!isLoggedIn) {
+      if (formData.password.length < 6) return 'Please choose a password of at least 6 characters to create your account.';
+      if (formData.password !== formData.confirmPassword) return 'Passwords do not match.';
+    }
+    return null;
+  };
+
+  const handleProceedFromStep1 = () => {
+    const msg = validateStep1();
+    if (msg) {
+      setError(msg);
+      return;
+    }
+    setError(null);
+    setStep(2);
+  };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
 
     const result = await placeOrder({
-      customerName: `${formData.firstName} ${formData.lastName}`,
-      customerEmail: formData.email,
-      customerPhone: formData.phone,
+      customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+      customerEmail: formData.email.trim(),
+      customerPhone: formData.phone.trim(),
       address: `${formData.address}, ${formData.state}, ${formData.zipCode}`,
       subtotal,
       discountTotal,
@@ -72,6 +100,7 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
       shippingTotal: activeShipping,
       total,
       paymentMethod: formData.paymentMethod,
+      password: isLoggedIn ? undefined : formData.password,
       items: cart.map(item => ({
         productId: item.productId,
         variationId: item.variationId,
@@ -83,7 +112,10 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
 
     if (result.success) {
       clearCart();
-      router.push('/checkout/order-success');
+      const params = new URLSearchParams();
+      if (result.accountCreated) params.set('account', 'new');
+      else if (result.linkedExistingAccount) params.set('account', 'linked');
+      router.push(`/checkout/order-success${params.toString() ? `?${params}` : ''}`);
     } else {
       setError(result.error || 'Failed to place order.');
       setIsLoading(false);
@@ -106,16 +138,41 @@ export default function CheckoutFlow({ paymentConfig, shippingZones, taxZones }:
           1. Shipping Information
         </h2>
         <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: '1fr 1fr' }}>
-          <input type="text" className="input-base" style={{ borderRadius: '0' }} placeholder="First Name" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
-          <input type="text" className="input-base" style={{ borderRadius: '0' }} placeholder="Last Name" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
-          <input type="email" className="input-base" placeholder="Email Address" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-          <input type="text" className="input-base" placeholder="Phone Number" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-          <input type="text" className="input-base" placeholder="Street Address" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
-          <input type="text" className="input-base" placeholder="State/Region (e.g. CA)" style={{ borderRadius: '0' }} value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} />
-          <input type="text" className="input-base" placeholder="Zip Code" style={{ borderRadius: '0' }} value={formData.zipCode} onChange={e => setFormData({...formData, zipCode: e.target.value})} />
+          <input type="text" className="input-base" style={{ borderRadius: '0' }} placeholder="First Name *" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
+          <input type="text" className="input-base" style={{ borderRadius: '0' }} placeholder="Last Name *" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
+          <input type="email" className="input-base" placeholder="Email Address *" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} readOnly={isLoggedIn} />
+          <input type="tel" className="input-base" placeholder="Phone Number *" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required />
+          <input type="text" className="input-base" placeholder="Street Address *" style={{ gridColumn: 'span 2', borderRadius: '0' }} value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+          <input type="text" className="input-base" placeholder="State/Region (e.g. CA) *" style={{ borderRadius: '0' }} value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} />
+          <input type="text" className="input-base" placeholder="Zip Code *" style={{ borderRadius: '0' }} value={formData.zipCode} onChange={e => setFormData({...formData, zipCode: e.target.value})} />
         </div>
+
+        {!isLoggedIn && (
+          <div style={{ marginTop: '32px', padding: '20px', backgroundColor: '#f9f9f9', border: '1px solid var(--color-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+              <strong style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px' }}>Create your account</strong>
+              <Link href={`/login?callbackUrl=/checkout`} style={{ fontSize: '12px', color: 'var(--color-primary)' }}>
+                Already have an account? Log in
+              </Link>
+            </div>
+            <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
+              We'll set up an account with this email so you can track your order and see your history next time.
+            </p>
+            <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: '1fr 1fr' }}>
+              <input type="password" className="input-base" style={{ borderRadius: '0' }} placeholder="Password * (min 6 chars)" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} autoComplete="new-password" />
+              <input type="password" className="input-base" style={{ borderRadius: '0' }} placeholder="Confirm Password *" value={formData.confirmPassword} onChange={e => setFormData({...formData, confirmPassword: e.target.value})} autoComplete="new-password" />
+            </div>
+          </div>
+        )}
+
+        {step === 1 && error && (
+          <div style={{ marginTop: '16px', padding: '10px 12px', backgroundColor: '#fff5f6', border: '1px solid #EC6B81', color: '#EC6B81', fontSize: '13px' }}>
+            {error}
+          </div>
+        )}
+
         {step === 1 && (
-          <button className="btn-primary" onClick={() => setStep(2)} style={{ marginTop: '24px', borderRadius: '0', padding: '12px 32px' }}>Calculate Shipping</button>
+          <button className="btn-primary" onClick={handleProceedFromStep1} style={{ marginTop: '24px', borderRadius: '0', padding: '12px 32px' }}>Calculate Shipping</button>
         )}
       </div>
 

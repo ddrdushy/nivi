@@ -50,6 +50,7 @@ model User {
   password       String
   role           String                @default("CUSTOMER") // ADMIN or CUSTOMER
   name           String?
+  phone          String?
   addresses      Address[]
   orders         Order[]
   resetTokens    PasswordResetToken[]
@@ -90,7 +91,7 @@ model Order {
   user           User?       @relation(fields: [userId], references: [id])
   customerName   String
   customerEmail  String
-  customerPhone  String?
+  customerPhone  String
   address        String?
   subtotal       Float       @default(0)
   taxTotal       Float       @default(0)
