@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import LogoutButton from "./LogoutButton";
+import AddressBook from "./AddressBook";
 
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);
@@ -13,11 +14,17 @@ export default async function AccountPage() {
 
   const userId = session.user.id;
 
-  const orders = await prisma.order.findMany({
-    where: { userId },
-    orderBy: { createdAt: 'desc' },
-    include: { items: true }
-  });
+  const [orders, addresses] = await Promise.all([
+    prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { items: true },
+    }),
+    prisma.address.findMany({
+      where: { userId },
+      orderBy: [{ isDefault: 'desc' }, { id: 'asc' }],
+    }),
+  ]);
 
   return (
     <div className="container" style={{ padding: '80px 24px', maxWidth: '800px' }}>
@@ -72,6 +79,8 @@ export default async function AccountPage() {
           ))}
         </div>
       )}
+
+      <AddressBook addresses={addresses} />
     </div>
   );
 }
