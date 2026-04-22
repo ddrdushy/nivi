@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import LogoutButton from "./LogoutButton";
 import AddressBook from "./AddressBook";
+
+export const metadata: Metadata = {
+  title: "My Account",
+  robots: { index: false, follow: false },
+};
 
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);

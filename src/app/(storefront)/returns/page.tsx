@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Returns & Refunds',
+  description: 'How to return a Nivi Organics order and what qualifies for a refund within our 9-day return window.',
+};
+
 function LegalPage({ title, lastUpdated, children }: { title: string; lastUpdated: string; children: React.ReactNode }) {
   return (
     <div>

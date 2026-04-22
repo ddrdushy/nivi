@@ -4,6 +4,7 @@ import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import NavIcons from '@/components/NavIcons';
 import NewsletterForm from '@/components/NewsletterForm';
+import { JsonLd, organizationJsonLd } from '@/lib/jsonLd';
 
 export default function StorefrontLayout({
   children,
@@ -13,6 +14,7 @@ export default function StorefrontLayout({
   return (
     <CartProvider>
       <WishlistProvider>
+        <JsonLd data={organizationJsonLd} />
         {/* ─── ANNOUNCEMENT BAR ─── */}
         <div style={{
           backgroundColor: 'var(--color-gold)',

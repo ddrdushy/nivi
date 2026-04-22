@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms & Conditions',
+  description: 'The terms that govern purchases, accounts, and use of the Nivi Organics store.',
+};
+
 function LegalPage({ title, lastUpdated, children }: { title: string; lastUpdated: string; children: React.ReactNode }) {
   return (
     <div>

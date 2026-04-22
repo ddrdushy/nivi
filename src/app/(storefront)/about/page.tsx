@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description: 'Learn how Nivi Organics sources single-origin essential oils, raw butters, and herbal powders directly from growers around the world.',
+};
+
 export default function AboutPage() {
   return (
     <div>

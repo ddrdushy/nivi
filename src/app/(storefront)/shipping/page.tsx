@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Shipping Policy',
+  description: 'Shipping rates, delivery windows, and worldwide dispatch details for Nivi Organics orders.',
+};
+
 function LegalPage({ title, lastUpdated, children }: { title: string; lastUpdated: string; children: React.ReactNode }) {
   return (
     <div>

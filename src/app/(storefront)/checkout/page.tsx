@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import CheckoutFlow from './CheckoutFlow';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Checkout',
+  robots: { index: false, follow: false },
+};
 
 export default async function CheckoutPage() {
   const settings = await prisma.storeSetting.findMany();

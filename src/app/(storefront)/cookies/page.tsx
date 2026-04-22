@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Cookie Policy',
+  description: 'How Nivi Organics uses cookies and similar technologies on this website.',
+};
+
 function LegalPage({ title, lastUpdated, children }: { title: string; lastUpdated: string; children: React.ReactNode }) {
   return (
     <div>

@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Contact Us',
+  description: 'Get in touch with Nivi Organics — we ship worldwide and respond to every enquiry within one business day.',
+};
+
 export default function ContactPage() {
   return (
     <div>

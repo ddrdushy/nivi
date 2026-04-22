@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Sitemap',
+  description: 'All pages on the Nivi Organics store, grouped for easy navigation.',
+};
 
 const sitemapLinks = [
   {
