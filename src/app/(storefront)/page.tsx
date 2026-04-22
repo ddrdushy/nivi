@@ -1,15 +1,17 @@
 import Link from 'next/link';
-import ProductCard from '@/components/ProductCard';
+import ProductGrid from '@/components/ProductGrid';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const products = await prisma.product.findMany({
-    include: { category: true }
-  });
-
-  const categories = ['All', 'Essential Oils', 'Raw Butters', 'Herbal Powders'];
+  const [products, categories] = await Promise.all([
+    prisma.product.findMany({
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.category.findMany({ orderBy: { name: 'asc' } }),
+  ]);
 
   return (
     <div>
@@ -111,31 +113,7 @@ export default async function HomePage() {
             <p style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>Add our products to your daily wellness line up</p>
           </div>
 
-          {/* Category Tabs */}
-          <div className="category-tabs">
-            {categories.map((cat, i) => (
-              <button key={cat} className={`category-tab${i === 0 ? ' active' : ''}`}>{cat}</button>
-            ))}
-          </div>
-
-          {/* Product Grid */}
-          {products.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--color-text-muted)' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🌿</div>
-              <p style={{ fontSize: '16px', marginBottom: '8px', fontWeight: '600' }}>No products yet</p>
-              <p style={{ fontSize: '13px' }}>Add products from the <Link href="/admin/products" style={{ color: 'var(--color-primary)' }}>Admin panel</Link></p>
-            </div>
-          ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-              gap: '24px',
-            }}>
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product as any} />
-              ))}
-            </div>
-          )}
+          <ProductGrid products={products} categories={categories} />
         </div>
       </section>
 
