@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import ProductGrid from '@/components/ProductGrid';
+import HeroSlider from '@/components/HeroSlider';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -15,56 +16,8 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* ─── HERO ─── */}
-      <section style={{
-        backgroundImage: 'linear-gradient(135deg, rgba(250,248,246,0.97) 0%, rgba(237,232,228,0.92) 100%), url("/images/decorations/hero_bg.png")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        padding: '120px 0',
-        textAlign: 'center',
-      }}>
-        <div className="container">
-          <p style={{
-            color: 'var(--color-primary)',
-            fontSize: '13px',
-            fontWeight: '600',
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            marginBottom: '16px',
-          }}>
-            🌿 Pure. Natural. Potent.
-          </p>
-          <h1 style={{
-            fontSize: 'clamp(40px, 6vw, 72px)',
-            color: 'var(--color-dark)',
-            marginBottom: '20px',
-            fontWeight: '600',
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '0.01em',
-            lineHeight: 1.1,
-          }}>
-            Natural Luxury.<br />
-            <span style={{ color: 'var(--color-primary)' }}>Redefined.</span>
-          </h1>
-          <p style={{
-            fontSize: '16px',
-            color: 'var(--color-text-muted)',
-            marginBottom: '40px',
-            maxWidth: '500px',
-            margin: '0 auto 40px',
-          }}>
-            Experience the finest essential oils, raw butters, and luxury powders sourced directly from nature.
-          </p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <Link href="#products" className="btn-primary" style={{ padding: '14px 36px', fontSize: '14px' }}>
-              Shop Collection
-            </Link>
-            <Link href="/register" className="btn-outline" style={{ padding: '14px 36px', fontSize: '14px' }}>
-              Create Account
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ─── HERO SLIDER ─── */}
+      <HeroSlider />
 
       {/* ─── FEATURES STRIP ─── */}
       <section style={{ backgroundColor: 'var(--color-dark)', padding: '20px 0' }}>
