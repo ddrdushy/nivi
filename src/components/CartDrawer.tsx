@@ -2,6 +2,7 @@
 
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type Props = {
   isOpen: boolean;
@@ -94,9 +95,15 @@ export default function CartDrawer({ isOpen, onClose }: Props) {
             <div style={{ display: 'grid', gap: '24px' }}>
               {cart.map((item) => (
                 <div key={item.id} style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <div style={{ width: '80px', height: '80px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--color-border)', flexShrink: 0 }}>
+                  <div style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--color-border)', flexShrink: 0 }}>
                     {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.name}
+                        fill
+                        sizes="80px"
+                        style={{ objectFit: 'cover' }}
+                      />
                     ) : (
                       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f9f9f9', fontSize: '32px' }}>🧴</div>
                     )}

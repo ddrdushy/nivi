@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import ProductInterface from './ProductInterface';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
@@ -108,9 +109,15 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 1fr', gap: '64px', alignItems: 'start' }}>
         {/* Product Image Panel */}
         {product.imageUrl ? (
-          <div style={{ aspectRatio: '1/1', border: '1px solid var(--color-border)', borderRadius: '8px', overflow: 'hidden' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ position: 'relative', aspectRatio: '1/1', border: '1px solid var(--color-border)', borderRadius: '8px', overflow: 'hidden' }}>
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              priority
+              sizes="(max-width: 900px) 100vw, 560px"
+              style={{ objectFit: 'cover' }}
+            />
           </div>
         ) : (
           <div

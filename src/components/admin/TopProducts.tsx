@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type ProductStats = {
   id: string;
@@ -29,8 +30,16 @@ export default function TopProducts({ products }: { products: ProductStats[] }) 
             <tr key={product.id}>
               <td>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '4px', backgroundColor: '#f3f4f6', overflow: 'hidden' }}>
-                    {product.imageUrl && <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                  <div style={{ position: 'relative', width: '32px', height: '32px', borderRadius: '4px', backgroundColor: '#f3f4f6', overflow: 'hidden' }}>
+                    {product.imageUrl && (
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        sizes="32px"
+                        style={{ objectFit: 'cover' }}
+                      />
+                    )}
                   </div>
                   <span style={{ fontWeight: '600', fontSize: '13px' }}>{product.name}</span>
                 </div>

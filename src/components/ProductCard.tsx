@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 
@@ -27,11 +28,13 @@ export default function ProductCard({ product }: Props) {
         
         {/* Image */}
         {product.imageUrl ? (
-          <div style={{ aspectRatio: '1/1', borderBottom: '1px solid var(--color-border)', width: '100%', overflow: 'hidden' }}>
-            <img 
-              src={product.imageUrl} 
-              alt={product.name} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
+          <div style={{ position: 'relative', aspectRatio: '1/1', borderBottom: '1px solid var(--color-border)', width: '100%', overflow: 'hidden' }}>
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 280px"
+              style={{ objectFit: 'cover', transition: 'transform 0.5s ease' }}
               className="card-img"
             />
           </div>

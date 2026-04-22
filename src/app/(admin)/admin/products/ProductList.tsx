@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { bulkDeleteProducts, createProduct, updateProduct, deleteProduct } from '@/app/actions/products';
 import type { ProductInput } from '@/app/actions/products';
 
@@ -226,11 +227,12 @@ export default function ProductList({
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       {product.imageUrl && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={product.imageUrl}
                           alt={product.name}
-                          style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--color-border)' }}
+                          width={44}
+                          height={44}
+                          style={{ objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                         />
                       )}
                       <div>

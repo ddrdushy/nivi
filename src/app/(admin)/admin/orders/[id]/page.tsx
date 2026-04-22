@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import OrderStatusUpdater from './OrderStatusUpdater';
 
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
@@ -68,11 +69,13 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   <tr key={item.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {(item.product as any)?.imageUrl && (
-                          <img
-                            src={(item.product as any).imageUrl}
+                        {item.product?.imageUrl && (
+                          <Image
+                            src={item.product.imageUrl}
                             alt={item.productName}
-                            style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--color-border)' }}
+                            width={48}
+                            height={48}
+                            style={{ objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                           />
                         )}
                         <div>
